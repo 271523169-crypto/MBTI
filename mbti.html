@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MBTI人格测试 | 自动跳转 · 自定义形象</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4fa 0%, #dfe8f2 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            min-height: 100vh;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mbti-card {
+            max-width: 820px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #1f3e4b 0%, #2c5a72 100%);
+            padding: 1.8rem 2rem;
+            text-align: center;
+            color: white;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .hero p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.4rem;
+        }
+
+        .progress-area {
+            padding: 1rem 2rem 0.5rem;
+        }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2c5a72;
+            margin-bottom: 0.5rem;
+        }
+        .progress-bar-bg {
+            background: #e2eaf1;
+            border-radius: 40px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #3c7ea3, #66a5c9);
+            width: 0%;
+            height: 100%;
+            border-radius: 40px;
+            transition: width 0.4s ease;
+        }
+
+        .question-section {
+            padding: 1rem 2rem 2rem;
+        }
+        .q-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .q-counter {
+            background: #eef2f8;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2c5f7a;
+        }
+        .q-dimension {
+            font-size: 0.75rem;
+            background: #ffffffcc;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            color: #4b6f89;
+            font-weight: 500;
+        }
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #1f3e4b;
+            margin-bottom: 2rem;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .option-btn {
+            background: white;
+            border: 1.5px solid #e2eaf1;
+            border-radius: 1.5rem;
+            padding: 1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            border-color: #8bb4d0;
+            background: #fefefe;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        .option-btn.active {
+            background: #ecf5fc;
+            border-color: #3c7ea3;
+            box-shadow: 0 6px 12px rgba(60,126,163,0.12);
+        }
+        .opt-marker {
+            width: 36px;
+            height: 36px;
+            background: #f0f5fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            color: #2c5f7a;
+        }
+        .option-btn.active .opt-marker {
+            background: #3c7ea3;
+            color: white;
+        }
+        .opt-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1f3e4b;
+            flex: 1;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 1px solid #cbdbe0;
+            padding: 0.75rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #2c5f7a;
+        }
+        .nav-btn.primary {
+            background: #2c5f7a;
+            border-color: #2c5f7a;
+            color: white;
+            box-shadow: 0 6px 12px rgba(44,95,122,0.2);
+        }
+        .nav-btn:active:not(:disabled) {
+            transform: scale(0.96);
+        }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-container {
+            padding: 1.5rem 2rem 2rem;
+        }
+        .result-hero {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: #fefaf5;
+            border-radius: 2rem;
+            padding: 1rem;
+        }
+        .avatar-frame {
+            flex-shrink: 0;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #f5ede2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        #resultAvatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .result-badge {
+            flex: 1;
+        }
+        .personality-type {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(125deg, #1e556e, #4281a5);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+        .type-sub {
+            font-size: 0.9rem;
+            color: #4f6f8a;
+            margin-top: 0.2rem;
+            font-weight: 500;
+        }
+        .type-desc {
+            background: #f0f6fd;
+            padding: 1rem 1.2rem;
+            border-radius: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #2c4d6b;
+            margin: 1rem 0;
+        }
+        .dimension-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            margin: 1.2rem 0;
+        }
+        .dim-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .dim-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2c5a72;
+        }
+        .dim-bar-bg {
+            background: #e2eaf1;
+            border-radius: 20px;
+            height: 6px;
+            overflow: hidden;
+        }
+        .dim-bar-fill {
+            background: #5293b5;
+            width: 50%;
+            height: 100%;
+            border-radius: 20px;
+        }
+        .reset-btn {
+            background: #eef3fa;
+            border: none;
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 3rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #2c5f7a;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .reset-btn:active {
+            background: #e0e8f0;
+            transform: scale(0.97);
+        }
+        .hidden {
+            display: none;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 1rem;
+            color: #8aa9c2;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        @media (max-width: 550px) {
+            body { padding: 0.8rem; }
+            .question-section { padding: 1rem 1.2rem 1.5rem; }
+            .progress-area { padding: 0.8rem 1.2rem 0; }
+            .question-text { font-size: 1.25rem; }
+            .opt-text { font-size: 0.9rem; }
+            .nav-btn { padding: 0.6rem 1.2rem; }
+            .result-hero { flex-direction: column; text-align: center; }
+            .personality-type { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mbti-card">
+    <div class="hero">
+        <h1>✨ MBTI 人格透视 ✨</h1>
+        <p>16道核心情境 · 自动跳转 · 自定义人物形象</p>
+    </div>
+    
+    <div class="progress-area">
+        <div class="progress-header">
+            <span>📋 答题进度</span>
+            <span><span id="answeredCounter">0</span> / <span id="totalQuestions">16</span></span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+    
+    <!-- 题目区 -->
+    <div class="question-section" id="questionPanel">
+        <div class="q-meta">
+            <span class="q-counter" id="questionCounter">第1 / 16题</span>
+            <span class="q-dimension" id="dimensionTag">维度 · EI</span>
+        </div>
+        <div class="question-text" id="questionText"></div>
+        <div class="options" id="optionsContainer"></div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn">◀ 上一题</button>
+        </div>
+    </div>
+    
+    <!-- 结果区 -->
+    <div id="resultPanel" class="result-container hidden">
+        <div class="result-hero">
+            <div class="avatar-frame">
+                <img id="resultAvatar" alt="MBTI人物形象">
+            </div>
+            <div class="result-badge">
+                <div class="personality-type" id="resultType">----</div>
+                <div class="type-sub" id="resultTitle"></div>
+            </div>
+        </div>
+        <div class="type-desc" id="resultDesc"></div>
+        <div class="dimension-scores" id="dimensionScores"></div>
+        <button class="reset-btn" id="resetBtn">🔄 重新测试</button>
+    </div>
+    <footer>点击选项自动跳转下一题 | 可自由替换人物形象图片</footer>
+</div>
+
+<script>
+    // ============================================================
+    // ************* 【替换图片说明】 *************
+    // 请将您准备好的16张MBTI人物图片放在与网页文件相同的目录下，
+    // 并按照以下命名规则保存：
+    // 
+    //   ISTJ.png, ISFJ.png, INFJ.png, INTJ.png,
+    //   ISTP.png, ISFP.png, INFP.png, INTP.png,
+    //   ESTP.png, ESFP.png, ENFP.png, ENTP.png,
+    //   ESTJ.png, ESFJ.png, ENFJ.png, ENTJ.png
+    //
+    // 如需修改图片路径或格式，请修改下方 IMAGE_BASE_PATH 和 IMAGE_EXT
+    // ============================================================
+    const IMAGE_BASE_PATH = './';   // 图片所在文件夹，例如 './images/' 或 './'
+    const IMAGE_EXT = '.png';       // 图片扩展名，支持 .png .jpg .webp 等
+    
+    // 如果您的图片命名不同，请修改 getImageUrl 函数
+    function getImageUrl(mbtiType) {
+        return `${IMAGE_BASE_PATH}${mbtiType}${IMAGE_EXT}`;
+    }
+    // ***********************************************************
+    
+    // 题库 (16题，每个维度4题)
+    const QUESTIONS = [
+        // EI
+        { text: "在大型聚会中，你通常？", dim: "EI", optA: "享受成为焦点，与人交流", optB: "喜欢安静观察或与熟人深聊", scoreA: +1, scoreB: -1 },
+        { text: "工作或学习后，你恢复精力的方式是？", dim: "EI", optA: "参加社交活动或派对", optB: "独处看书、听音乐", scoreA: +1, scoreB: -1 },
+        { text: "你更倾向于？", dim: "EI", optA: "先行动后思考，边做边聊", optB: "先独立思考再表达", scoreA: +1, scoreB: -1 },
+        { text: "与人交谈时，你更乐意？", dim: "EI", optA: "广泛结识新朋友", optB: "深入少数知己", scoreA: +1, scoreB: -1 },
+        // SN
+        { text: "你更关注？", dim: "SN", optA: "现实细节，具体事实", optB: "未来可能性，潜在意义", scoreA: +1, scoreB: -1 },
+        { text: "你觉得哪种描述更贴切？", dim: "SN", optA: "脚踏实地，注重实际", optB: "天马行空，富于想象", scoreA: +1, scoreB: -1 },
+        { text: "当学习新技能时，你更喜欢？", dim: "SN", optA: "按步骤和实例操作", optB: "探索原理和创意应用", scoreA: +1, scoreB: -1 },
+        { text: "你对信息的信任更倾向于？", dim: "SN", optA: "经验和已验证的事实", optB: "直觉和灵感", scoreA: +1, scoreB: -1 },
+        // TF
+        { text: "做重要决定时，你更依赖？", dim: "TF", optA: "逻辑分析与客观原则", optB: "个人感受与和谐价值", scoreA: +1, scoreB: -1 },
+        { text: "你更欣赏哪种品质？", dim: "TF", optA: "公平公正，坚定果断", optB: "善解人意，富有同情心", scoreA: +1, scoreB: -1 },
+        { text: "冲突时，你通常？", dim: "TF", optA: "坚持立场，指出对错", optB: "顾及感受，寻求妥协", scoreA: +1, scoreB: -1 },
+        { text: "你希望他人如何评价你？", dim: "TF", optA: "能力强，公正可靠", optB: "温暖体贴，乐于助人", scoreA: +1, scoreB: -1 },
+        // JP
+        { text: "你的生活风格更接近？", dim: "JP", optA: "计划先行，有条不紊", optB: "随遇而安，灵活应对", scoreA: +1, scoreB: -1 },
+        { text: "面对任务清单，你？", dim: "JP", optA: "喜欢按清单逐项完成", optB: "视情况调整顺序", scoreA: +1, scoreB: -1 },
+        { text: "旅行时，你更倾向？", dim: "JP", optA: "提前规划行程与住宿", optB: "随心探索，临时决定", scoreA: +1, scoreB: -1 },
+        { text: "对待截止日期，你通常？", dim: "JP", optA: "尽早开始，避免压力", optB: "最后时刻效率最高", scoreA: +1, scoreB: -1 }
+    ];
+    const TOTAL = QUESTIONS.length;
+    document.getElementById('totalQuestions').innerText = TOTAL;
+    
+    // 类型描述库
+    const TYPE_DESC = {
+        "ISTJ": "检查员型 — 严肃、实际、有条理，重视传统与责任，是可靠的守护者。",
+        "ISFJ": "守护者型 — 温柔体贴，默默奉献，注重细节，忠诚于他人。",
+        "INFJ": "提倡者型 — 富有远见，理想主义，深沉关怀，致力于实现意义。",
+        "INTJ": "建筑师型 — 战略家，独立理性，追求知识与效率，完美主义者。",
+        "ISTP": "鉴赏家型 — 冷静务实，善于工具，喜欢冒险与实操。",
+        "ISFP": "探险家型 — 敏感艺术，热爱自由，活在当下，品味生活。",
+        "INFP": "调停者型 — 理想主义，充满好奇心，忠于核心价值观。",
+        "INTP": "逻辑学家型 — 创新思考，热衷理论，对知识有无尽渴望。",
+        "ESTP": "企业家型 — 精力充沛，行动派，随机应变，享受挑战。",
+        "ESFP": "表演者型 — 热情开朗，感染力强，喜欢成为焦点。",
+        "ENFP": "竞选者型 — 热情创造力，善于人际，追求新可能性。",
+        "ENTP": "辩论家型 — 机智善辩，喜欢智力交锋，创新者。",
+        "ESTJ": "监督者型 — 高效务实，组织力强，果断执行，重视规则。",
+        "ESFJ": "执政官型 — 热心合作，重视和谐，乐于助人，善于社交。",
+        "ENFJ": "主人公型 — 鼓舞人心，善于引导，富有感染力。",
+        "ENTJ": "指挥官型 — 强势领导，战略清晰，目标导向，天生统帅。"
+    };
+    const DEFAULT_DESC = "独特的人格组合，兼具多重特质，展现出独一无二的内心世界。";
+    
+    // 全局状态
+    let answers = new Array(TOTAL).fill(null);
+    let currentIdx = 0;
+    let testCompleted = false;
+    let currentType = "";
+    
+    // DOM 元素
+    const qPanel = document.getElementById('questionPanel');
+    const resultPanel = document.getElementById('resultPanel');
+    const qCounterSpan = document.getElementById('questionCounter');
+    const dimTagSpan = document.getElementById('dimensionTag');
+    const qTextDiv = document.getElementById('questionText');
+    const optsDiv = document.getElementById('optionsContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const progressFill = document.getElementById('progressFill');
+    const answeredSpan = document.getElementById('answeredCounter');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultAvatar = document.getElementById('resultAvatar');
+    const resultTypeSpan = document.getElementById('resultType');
+    const resultTitleSpan = document.getElementById('resultTitle');
+    const resultDescDiv = document.getElementById('resultDesc');
+    const dimScoresDiv = document.getElementById('dimensionScores');
+    
+    // 辅助函数
+    function answeredCount() { return answers.filter(a => a !== null).length; }
+    function updateProgress() {
+        let cnt = answeredCount();
+        let percent = (cnt / TOTAL) * 100;
+        progressFill.style.width = `${percent}%`;
+        answeredSpan.innerText = cnt;
+    }
+    
+    // 自动跳转
+    function autoAdvance() {
+        if (testCompleted) return;
+        if (currentIdx < TOTAL - 1) {
+            currentIdx++;
+            renderQuestion();
+            updateProgress();
+        } else if (currentIdx === TOTAL - 1 && answeredCount() === TOTAL) {
+            showResult();
+        }
+    }
+    
+    function selectOption(selectedVal) {
+        if (testCompleted) return;
+        answers[currentIdx] = selectedVal;
+        renderQuestion();      // 刷新高亮
+        updateProgress();
+        autoAdvance();
+    }
+    
+    function renderQuestion() {
+        const q = QUESTIONS[currentIdx];
+        if (!q) return;
+        qCounterSpan.innerText = `第${currentIdx+1} / ${TOTAL}题`;
+        dimTagSpan.innerText = `维度 · ${q.dim}`;
+        qTextDiv.innerText = q.text;
+        const selected = answers[currentIdx];
+        const optHtml = `
+            <div class="option-btn" data-opt="A"><div class="opt-marker">A</div><div class="opt-text">${escapeHtml(q.optA)}</div></div>
+            <div class="option-btn" data-opt="B"><div class="opt-marker">B</div><div class="opt-text">${escapeHtml(q.optB)}</div></div>
+        `;
+        optsDiv.innerHTML = optHtml;
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            const val = btn.getAttribute('data-opt');
+            if (selected === val) btn.classList.add('active');
+            btn.addEventListener('click', () => selectOption(val));
+        });
+        prevBtn.disabled = (currentIdx === 0);
+    }
+    
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    // 计算MBTI类型
+    function computeMBTI() {
+        let scores = { EI:0, SN:0, TF:0, JP:0 };
+        for(let i=0;i<TOTAL;i++){
+            let q = QUESTIONS[i];
+            let ans = answers[i];
+            if(!ans) continue;
+            let delta = ans === 'A' ? q.scoreA : q.scoreB;
+            scores[q.dim] += delta;
+        }
+        const ei = scores.EI >= 0 ? 'E' : 'I';
+        const sn = scores.SN >= 0 ? 'S' : 'N';
+        const tf = scores.TF >= 0 ? 'T' : 'F';
+        const jp = scores.JP >= 0 ? 'J' : 'P';
+        const type = ei+sn+tf+jp;
+        const getStrength = (score, leftLetter, actual) => {
+            let raw = Math.min(4, Math.max(-4, score));
+            if(actual === leftLetter) return ((raw + 4) / 8) * 100;
+            else return ((-raw + 4) / 8) * 100;
+        };
+        const strengths = {
+            EI: getStrength(scores.EI, 'E', ei),
+            SN: getStrength(scores.SN, 'S', sn),
+            TF: getStrength(scores.TF, 'T', tf),
+            JP: getStrength(scores.JP, 'J', jp)
+        };
+        return { type, strengths, letters:{ei,sn,tf,jp} };
+    }
+    
+    // 显示结果并加载对应图片
+    function showResult() {
+        if (answeredCount() !== TOTAL) return;
+        const { type, strengths, letters } = computeMBTI();
+        currentType = type;
+        const desc = TYPE_DESC[type] || DEFAULT_DESC;
+        resultTypeSpan.innerText = type;
+        let subtitle = letters.ei === 'E' ? "外向 · 能量来自外界互动" : "内向 · 能量源于内在沉思";
+        resultTitleSpan.innerHTML = `${type} · ${subtitle}`;
+        resultDescDiv.innerHTML = desc;
+        
+        // 显示对应的人物图片
+        resultAvatar.src = getImageUrl(type);
+        resultAvatar.onerror = function() {
+            // 如果图片加载失败，显示提示
+            this.src = '';
+            this.alt = `未找到${type}图片，请检查文件名`;
+        };
+        
+        // 维度条
+        const dims = [
+            { left:"E (外向)", right:"I (内向)", strength:strengths.EI, final:letters.ei },
+            { left:"S (实感)", right:"N (直觉)", strength:strengths.SN, final:letters.sn },
+            { left:"T (思考)", right:"F (情感)", strength:strengths.TF, final:letters.tf },
+            { left:"J (判断)", right:"P (感知)", strength:strengths.JP, final:letters.jp }
+        ];
+        let dimHtml = '';
+        dims.forEach(d => {
+            let fill = Math.min(100, Math.max(0, d.strength));
+            let tend = (d.final === d.left.charAt(0)) ? d.left : d.right;
+            dimHtml += `
+                <div class="dim-item">
+                    <div class="dim-label"><span>${d.left}</span><span>${tend} ${Math.round(fill)}%</span><span>${d.right}</span></div>
+                    <div class="dim-bar-bg"><div class="dim-bar-fill" style="width:${fill}%;"></div></div>
+                </div>
+            `;
+        });
+        dimScoresDiv.innerHTML = dimHtml;
+        
+        qPanel.classList.add('hidden');
+        resultPanel.classList.remove('hidden');
+        testCompleted = true;
+    }
+    
+    // 重置测试
+    function resetTest() {
+        answers = new Array(TOTAL).fill(null);
+        currentIdx = 0;
+        testCompleted = false;
+        resultPanel.classList.add('hidden');
+        qPanel.classList.remove('hidden');
+        renderQuestion();
+        updateProgress();
+    }
+    
+    function goPrev() {
+        if (testCompleted) return;
+        if (currentIdx > 0) {
+            currentIdx--;
+            renderQuestion();
+            updateProgress();
+        }
+    }
+    
+    prevBtn.addEventListener('click', goPrev);
+    resetBtn.addEventListener('click', resetTest);
+    
+    // 初始化
+    resetTest();
+</script>
+</body>
+</html>
